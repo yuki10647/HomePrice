@@ -81,3 +81,9 @@ add_new_columns(all_df)
 # pd.get_dummiesを使うとカテゴリ変数化(文字列を数値に変換）
 all_df = pd.get_dummies(all_df)
 print(all_df.head())
+
+# %% 
+# 目的変数
+sns.distplot(train['SalePrice'])
+# 正規分布に近づける。方法は外れ値を除くか、対数変換をするか。
+sns.distplot(np.log(train['SalePrice']))
