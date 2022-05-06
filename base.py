@@ -80,7 +80,7 @@ add_new_columns(all_data)
 # %%
 # pd.get_dummiesを使うとカテゴリ変数化(文字列を数値に変換）
 all_data = pd.get_dummies(all_data)
-print(all_data.head())
+all_data.head()
 
 # %%
 # 学習データと予測データに分割して元のデータフレームに戻す。
