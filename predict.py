@@ -94,10 +94,15 @@ train_y = train['SalePriceLog']
 test = test
 
 # %%
-from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.linear_model import ElasticNet as en
 from sklearn.ensemble import RandomForestRegressor
 from lightgbm import LGBMRegressor
 from sklearn.model_selection import GridSearchCV
+ #from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+
+# pipeline つないでない StandardScalerなし
 
 def get_best_estimator(model, params):
     grid_model = GridSearchCV(model, param_grid=params, scoring="neg_mean_squared_error", cv=5)
@@ -106,29 +111,18 @@ def get_best_estimator(model, params):
     print('{0}, param:{1}, rmse:{2}'.format(model.__class__.__name__, grid_model.best_params_, np.round(rmse, 4)))
     return grid_model.best_estimator_
 
-ridge_params = {'alpha':[0.05, 0.1, 1, 5, 8, 10, 15]}
-lasso_params = {'alpha':[0.001, 0.005, 0.008, 0.05, 0.1, 0.3, 0.5, 1, 5, 10]}
-elastic_params = {'alpha':[0.05, 0.1, 0.5, 1, 3, 5, 8]}
-ridge_reg = Ridge(max_iter=10000)
-lasso_reg = Lasso(max_iter=10000) 
-elastic_reg = ElasticNet(l1_ratio=0.7, max_iter=10000)
-
-lasso_be = get_best_estimator(lasso_reg, lasso_params)
-ridge_be = get_best_estimator(ridge_reg, ridge_params)
-elastic_be = get_best_estimator(elastic_reg, elastic_params)
 # 試行回数足りてないよ！というメッセージだがあまり差がみられないので今回は無視してよい？
 
 # %%
-lgbm_params = {
-    'max_depth':[5, 10, 15, 20, 25, 30],
-    'learning_rate':[0.01, 0.05, 0.1, 0.5, 1],
-}
-lgbm_reg = LGBMRegressor(n_estimators=1000)
+rf_regressor_params = {'n_estimators':[1000, 2000, 3000],
+                       'max_depth':[5, 6, 7, 8]}
 
-lgbm_be = get_best_estimator(lgbm_reg, lgbm_params)
+rf_regressor_reg = RandomForestRegressor(random_state=42)
+
+rf_regressor_be = get_best_estimator(rf_regressor_reg, rf_regressor_params)
 
 # %%
-preds = np.expm1(lgbm_be.predict(test))
+preds = np.expm1(rf_regressor_be.predict(test))
 
 # %%
 sns.distplot(preds)
